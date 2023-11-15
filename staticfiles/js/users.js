@@ -2,8 +2,8 @@ const currentUser = parseInt($('#current-user').val());
 const chatSection = $('#chat');
 
 
-function renderText(message) {
-    const position = message.sender.id === currentUser ? 'left' : 'right';
+function renderMessage(message) {
+    const position = message.sender.id === currentUser ? 'right' : 'left';
     const msg = `
         <li class="message ${position}">
             <span class="badge rounded-pill bg-success">${message.sender.username}</span>
@@ -14,6 +14,7 @@ function renderText(message) {
         </li>
         `;
     $(msg).appendTo('#messages');
+    messageList.animate({scrollTop: messageList.prop('scrollHeight')});
 }
 
 
@@ -21,10 +22,10 @@ function showChatSection(recipient_id) {
     let messageList = $('#messages');
     $.getJSON(`/api/chat/?recipient=${recipient_id}`, (data) => {
         messageList.children('.message').remove();
-        data['results'].forEach( msg => renderText(msg));
+        data['results'].forEach( msg => renderMessage(msg));
         messageList.animate({scrollTop: messageList.prop('scrollHeight')});
     });
-}
+} 
 
 
 function selectRecipient(recipient_id) {
@@ -97,20 +98,53 @@ function sendMessage(recipient, text) {
 }
 
 
+function getMessageById(message) {
+    $.getJSON(`/api/chat/${message.id}/`, function (data) {
+        renderMessage(data);
+        $('#messages').animate({scrollTop: $('#messages').prop('scrollHeight')});
+    });
+}
+
+
+const checkElement = async selector => {
+    while ( document.querySelector(selector) === null) {
+      await new Promise( resolve =>  requestAnimationFrame(resolve) )
+    }
+    return document.querySelector(selector); 
+};
+
+
 $(document).ready(function () { 
     getUsers();
-    
-    $('#chat-text').keypress((e) => {
-        if (e.keyCode == 13)
-        $('#chat-send').click();
-    });
 
-    $('#chat-send').click(() => {
-        const text = $('#chat-text').val();
-        currentRecipient = $('#users').find('.nav-link.active')[0].getAttribute('id');
-        if (text.length > 0) {
-            sendMessage(currentRecipient, text);
-            $('#chat-text').val('');
-        }
+    checkElement('.user > .nav-link.active').then((selector) => {
+        const selectedRecipient = $('.user > .nav-link.active')[0].getAttribute('id');
+        var socket = new WebSocket(`ws://${window.location.host}/ws/sample_room/`);
+
+        socket.onopen = function (e) {
+            console.log("The connection was setup successfully !");
+        };
+    
+    
+        $('#chat-text').keypress((e) => {
+            if (e.keyCode == 13)
+            $('#chat-send').click();
+        });
+    
+        $('#chat-send').click(() => {
+            const text = $('#chat-text').val();            
+            if (text.length > 0) {
+                socket.send(JSON.stringify({
+                    'text': text,
+                    'receiver': selectedRecipient
+                }));
+                $('#chat-text').val('');
+            }
+        });
+    
+        socket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            renderMessage(data.message);
+        };
     });
 });

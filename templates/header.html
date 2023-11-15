@@ -5,11 +5,12 @@
   </button>
   <ul class="navbar-nav flex-direction-row ml-auto px-3">
       <li class="nav-item">
+
           <a href="{% url 'logout' %}" class="nav-link active" style="font-weight: bold !important">
-            <span data-feather="log-out"></span>
+              (<span class="pr-2">{{user.username}}</span>)
+              <span data-feather="log-out"></span>
             Logout
           </a>
-
       </li>
   </ul>
 </header>
