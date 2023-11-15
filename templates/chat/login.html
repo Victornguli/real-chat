@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="container-fluid">
+      <div class="row">
+        <main class="mt-5 ml-auto ml-auto text-center">
+            <div class="container m-auto">
+                <div class="">
+                    <h1>Login</h1>
+                </div>
+                <div class="row">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" action="{% url 'login' %}">
+                                {% csrf_token %}
+                                <table>
+                                <tr>
+                                    <td>{{ form.username.label_tag }}</td>
+                                    <td>{{ form.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ form.password.label_tag }}</td>
+                                    <td>{{ form.password }}</td>
+                                </tr>
+                                </table>
+
+                                <input type="submit" value="login">
+                                <input type="hidden" name="next" value="{{ next }}">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+        // let sessionKey = '{{ request.session.session_key }}';
+        // let currentUser = '{{ request.user.username }}';
+    </script>
+    <script src="{% static 'js/app.js' %}"></script>
+
+{% endblock %}
