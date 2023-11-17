@@ -15,7 +15,6 @@ function renderMessage(message) {
         </li>
         `;
     $(msg).appendTo(messageList);
-    messageList.animate({scrollTop: messageList.prop('scrollHeight')});
 }
 
 
@@ -119,7 +118,6 @@ $(document).ready(function () {
     getUsers();
 
     checkElement('.user > .nav-link.active').then((selector) => {
-        const selectedRecipient = $('.user > .nav-link.active')[0].getAttribute('id');
         var socket = new WebSocket(`ws://${window.location.host}/ws/sample_room/`);
 
         socket.onopen = function (e) {
@@ -133,6 +131,7 @@ $(document).ready(function () {
         });
 
         $('#chat-send').click(() => {
+            let selectedRecipient = $('.user > .nav-link.active')[0].getAttribute('id');
             const text = $('#chat-text').val();
             if (text.length > 0) {
                 socket.send(JSON.stringify({
@@ -146,6 +145,7 @@ $(document).ready(function () {
         socket.onmessage = function (e) {
             const data = JSON.parse(e.data);
             renderMessage(data.message);
+            $('#messages').animate({scrollTop: $('#messages').prop('scrollHeight')});
         };
     });
 });
