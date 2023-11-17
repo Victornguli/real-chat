@@ -1,5 +1,6 @@
 const currentUser = parseInt($('#current-user').val());
 const chatSection = $('#chat');
+let messageList = $('#messages');
 
 
 function renderMessage(message) {
@@ -13,7 +14,7 @@ function renderMessage(message) {
             </div>
         </li>
         `;
-    $(msg).appendTo('#messages');
+    $(msg).appendTo(messageList);
     messageList.animate({scrollTop: messageList.prop('scrollHeight')});
 }
 
@@ -25,7 +26,7 @@ function showChatSection(recipient_id) {
         data['results'].forEach( msg => renderMessage(msg));
         messageList.animate({scrollTop: messageList.prop('scrollHeight')});
     });
-} 
+}
 
 
 function selectRecipient(recipient_id) {
@@ -37,18 +38,18 @@ function getUsers() {
     $.getJSON('/api/users/', (data) => {
         $('#users').children('.user').remove();
         const users = data['results'];
-        for (var i=0; i<users.length; i++) {
-            
+        for (let i=0; i<users.length; i++) {
+
             const userTab = `
                 <li class="nav-item user" role="presentation">
-                    <button class="nav-link ${i == 0 ? 'active': ''}" id="${users[i]['id']}" data-bs-toggle="tab"
+                    <button class="nav-link ${i === 0 ? 'active': ''}" id="${users[i]['id']}" data-bs-toggle="tab"
                         data-bs-target="messages" type="button" role="tab" aria-controls="messages"
                         aria-selected="true">${users[i]['username']}</button>
                 </li>
             `;
             $(userTab).appendTo('#users');
         }
-        
+
         if (data['count']) {
             showChatSection(users[0]['id']);
         }
@@ -60,11 +61,11 @@ function getUsers() {
 }
 
 function getCookie(name) {
-    var cookieValue = null;
+    let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -82,7 +83,7 @@ function sendMessage(recipient, text) {
         type: 'POST',
         data: {
             'text': text,
-            'receiver_id': recipient, 
+            'receiver_id': recipient,
         },
         beforeSend: function(xhr, settings) {
             xhr.setRequestHeader('X-CSRFToken', csrftoken);
@@ -110,11 +111,11 @@ const checkElement = async selector => {
     while ( document.querySelector(selector) === null) {
       await new Promise( resolve =>  requestAnimationFrame(resolve) )
     }
-    return document.querySelector(selector); 
+    return document.querySelector(selector);
 };
 
 
-$(document).ready(function () { 
+$(document).ready(function () {
     getUsers();
 
     checkElement('.user > .nav-link.active').then((selector) => {
@@ -124,15 +125,15 @@ $(document).ready(function () {
         socket.onopen = function (e) {
             console.log("The connection was setup successfully !");
         };
-    
-    
+
+
         $('#chat-text').keypress((e) => {
             if (e.keyCode == 13)
             $('#chat-send').click();
         });
-    
+
         $('#chat-send').click(() => {
-            const text = $('#chat-text').val();            
+            const text = $('#chat-text').val();
             if (text.length > 0) {
                 socket.send(JSON.stringify({
                     'text': text,
@@ -141,7 +142,7 @@ $(document).ready(function () {
                 $('#chat-text').val('');
             }
         });
-    
+
         socket.onmessage = function (e) {
             const data = JSON.parse(e.data);
             renderMessage(data.message);
