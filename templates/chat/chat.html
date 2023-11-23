@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+{% include 'header.html' %}
+
+<div class="container-fluid">
+    <div class="row">
+        {% include 'sidenav.html' %}
+        <input id="current-user" type="text display-none" hidden value="{{user.id}}">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+            <div class="container">
+                <div class="page-header">
+                    <h3>Chat with a user
+                    </h3>
+                    <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                Server Error!
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <ul class="nav nav-tabs" id="users" role="tablist">
+                        </ul>
+
+                        <div class="tab-content" id="userChat">
+                            <div class="tab-pane fade show" id="1" role="tabpanel" aria-labelledby="home-tab">home</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul id="messages" class="messages">
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="input-group">
+                                <input id="chat-text" type="text" class="form-control input"
+                                    placeholder="Type something" maxlength="500">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info btn" id="chat-send">Send</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/chat.js' %}"></script>
+{% endblock %}
